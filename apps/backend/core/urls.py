@@ -1,6 +1,14 @@
-# apps/backend/core/urls.py  (or project's main urls.py)
+# apps/backend/core/urls.py
+
+from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('api/churches/', include('churches.urls')),
+    path('admin/', admin.site.urls),
+    path('api/churches/', include('churches.urls')),  # Branch Discovery API
 ]
+
+# Serve media files (images)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
