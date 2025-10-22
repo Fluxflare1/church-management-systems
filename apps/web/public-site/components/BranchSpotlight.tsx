@@ -19,7 +19,6 @@ export default function BranchSpotlight({ branch }: Props) {
       <div className="mt-6 flex flex-col md:flex-row items-center gap-6 bg-white border rounded-lg p-6 shadow-sm">
         <div className="relative w-full md:w-1/3 h-48 rounded overflow-hidden">
           {branch.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <Image src={branch.image} alt={branch.name} fill style={{ objectFit: 'cover' }} />
           ) : (
             <div className="w-full h-full bg-neutral-100 flex items-center justify-center">{branch.name}</div>
