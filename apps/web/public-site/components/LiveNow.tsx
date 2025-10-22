@@ -2,15 +2,14 @@
 'use client';
 import useSWR from 'swr';
 import Link from 'next/link';
-import { fetchJSON, apiBase } from '../lib/fetcher'; // fetcher default used in server files; we will import fetchJSON directly where necessary
 import React from 'react';
 import type { LiveStream } from '../types';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function LiveNow() {
-  // SWR fetch to /api/v1/streams/live/
-  const { data, error } = useSWR<LiveStream[]>(`${process.env.NEXT_PUBLIC_API_URL ?? 'https://api.thogmi.org'}/api/v1/streams/live/`, fetcher, { refreshInterval: 10_000 });
+  const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.thogmi.org';
+  const { data, error } = useSWR<LiveStream[]>(`${apiBase}/api/v1/streams/live/`, fetcher, { refreshInterval: 10000 });
 
   if (error) {
     return (
