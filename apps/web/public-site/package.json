@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "next": "14.x",
+    "react": "18.x",
+    "react-dom": "18.x",
+    "swr": "^2.1.0",
+    "date-fns": "^2.30.0"
+  }
+}
