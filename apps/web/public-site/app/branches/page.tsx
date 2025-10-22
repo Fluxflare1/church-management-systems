@@ -1,70 +1,65 @@
+// apps/web/public-site/app/branches/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
-import { BranchSearch } from '@/components/branches/BranchSearch';
-import { BranchList } from '@/components/branches/BranchList';
-import { BranchMap } from '@/components/branches/BranchMap';
-import { BranchDetailsModal } from '@/components/branches/BranchDetailsModal';
-import { getBranchHierarchy } from '@/lib/api/branches';
+import React, { useEffect, useState } from 'react';
+import { getAllBranches, searchBranches, Branch } from '@/lib/branches';
+import BranchSearch from '@/components/branches/BranchSearch';
+import BranchList from '@/components/branches/BranchList';
+import BranchMap from '@/components/branches/BranchMap';
+import BranchDetailsModal from '@/components/branches/BranchDetailsModal';
 
-export default function BranchesPage() {
-  const [branches, setBranches] = useState<any[]>([]);
-  const [filtered, setFiltered] = useState<any[]>([]);
-  const [selectedBranch, setSelectedBranch] = useState<any | null>(null);
+export default function BranchDiscoveryPage() {
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [selected, setSelected] = useState<Branch | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const data = await getBranchHierarchy();
-      setBranches(data);
-      setFiltered(data);
+      try {
+        const data = await getAllBranches();
+        setBranches(data);
+      } catch (err) {
+        console.error('Failed to load branches', err);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
-  const handleSearch = (query: string) => {
-    if (!query) {
-      setFiltered(branches);
-      return;
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) return;
+    setLoading(true);
+    try {
+      const results = await searchBranches(query);
+      setBranches(results);
+    } catch (err) {
+      console.error('Search failed', err);
+    } finally {
+      setLoading(false);
     }
-    const q = query.toLowerCase();
-    const results = branches
-      .map(country => ({
-        ...country,
-        regions: country.regions.map(region => ({
-          ...region,
-          branches: region.branches.filter(
-            b =>
-              b.name.toLowerCase().includes(q) ||
-              b.address.toLowerCase().includes(q) ||
-              b.pastors.join(' ').toLowerCase().includes(q)
-          ),
-        })),
-      }))
-      .filter(
-        c =>
-          c.regions.some(r => r.branches.length > 0) ||
-          c.name.toLowerCase().includes(q)
-      );
-    setFiltered(results);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-7xl mx-auto px-6">
-        <h1 className="text-3xl font-bold mb-6 text-center text-gray-900">
-          Find a THOGMi Branch Near You
-        </h1>
-        <BranchSearch onSearch={handleSearch} />
-        <div className="grid md:grid-cols-2 gap-8 mt-10">
-          <BranchList data={filtered} onSelect={setSelectedBranch} />
-          <BranchMap data={filtered} onSelect={setSelectedBranch} />
-        </div>
-      </div>
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <h1 className="text-2xl font-bold mb-6 text-center">Find a THOGMi Branch</h1>
 
-      {selectedBranch && (
-        <BranchDetailsModal
-          branch={selectedBranch}
-          onClose={() => setSelectedBranch(null)}
-        />
+      <BranchSearch onSearch={handleSearch} />
+
+      {loading && (
+        <div className="text-center text-neutral-500 mt-8">Loading branches...</div>
+      )}
+
+      {!loading && (
+        <>
+          <div className="grid md:grid-cols-2 gap-6 mt-8">
+            <BranchList branches={branches} onSelect={setSelected} />
+            <BranchMap branches={branches} onSelect={setSelected} />
+          </div>
+
+          {selected && (
+            <BranchDetailsModal branch={selected} onClose={() => setSelected(null)} />
+          )}
+        </>
       )}
     </div>
   );
