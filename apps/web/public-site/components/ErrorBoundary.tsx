@@ -21,9 +21,8 @@ export default class ErrorBoundary extends React.Component<Props, State> {
     return { hasError: true };
   }
 
-  componentDidCatch(error: any, info: any) {
-    // In production, consider reporting to external service (Sentry) — omitted per spec.
-    // console.error(error, info);
+  componentDidCatch(error: any) {
+    // intentional no-op per spec (no external services configured)
   }
 
   render() {
