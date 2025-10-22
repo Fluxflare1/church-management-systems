@@ -47,7 +47,6 @@ export default function Hero({ hero }: Props) {
 
         <div className="relative h-64 md:h-80 rounded-lg overflow-hidden shadow">
           {hero.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <Image src={hero.image} alt={hero.title} fill style={{ objectFit: 'cover' }} priority sizes="(max-width: 768px) 100vw, 50vw" />
           ) : (
             <div className="w-full h-full bg-neutral-100 flex items-center justify-center">No image</div>
