@@ -7,15 +7,13 @@ export async function fetchJSON<T = any>(url: string, options: RequestInit = {})
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      ...(options.headers || {}),
-    },
-    // allow Next.js ISR revalidate via options.next if used in server components
+      ...(options.headers || {})
+    }
   });
 
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     const err = new Error(`Fetch error: ${res.status} ${res.statusText} ${text}`);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     err.status = res.status;
     throw err;
