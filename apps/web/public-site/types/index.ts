@@ -21,8 +21,8 @@ export interface HeroContent {
 }
 
 export interface ServiceTime {
-  day: string; // e.g., "Sunday"
-  time: string; // e.g., "08:00"
+  day: string;
+  time: string;
 }
 
 export interface ContactInfo {
@@ -65,7 +65,7 @@ export interface ChurchEvent {
   location?: string;
   eventType: 'service' | 'conference' | 'training' | 'social' | 'outreach';
   scope: 'global' | 'national' | 'regional' | 'branch';
-  branches?: string[]; // branch ids
+  branches?: string[];
   registration?: {
     required: boolean;
     capacity?: number;
