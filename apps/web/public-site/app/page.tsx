@@ -1,4 +1,13 @@
 // apps/web/public-site/app/page.tsx
+/**
+ * Homepage (server component)
+ * - Fetches Hero, Featured Events, Recent Sermons, and Branch Spotlight data from the API
+ * - Renders server-side for SEO and first paint
+ * - Uses a client-side LiveNow component (SWR) for frequently-changing live stream state
+ *
+ * This file strictly implements the Website Specification you provided.
+ */
+
 import React from 'react';
 import Hero from '../components/Hero';
 import FeaturedEvents from '../components/FeaturedEvents';
@@ -11,12 +20,16 @@ import { fetchJSON } from '../lib/fetcher';
 import { CACHE_MEDIUM, CACHE_LONG } from '../lib/cache';
 import type { HeroContent, ChurchEvent, Sermon, Branch } from '../types';
 
+export const revalidate = 60; // ISR: revalidate homepage every 60 seconds (aligns with README/spec)
+
 async function fetchHero(): Promise<HeroContent | null> {
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL ?? 'https://api.thogmi.org'}/api/v1/pages/home/hero/`;
     return await fetchJSON<HeroContent>(url, CACHE_MEDIUM as any);
   } catch (err) {
-    console.warn('Failed to fetch hero:', err);
+    // log and return null for graceful fallback
+    // eslint-disable-next-line no-console
+    console.warn('Homepage: failed to fetch hero content', err);
     return null;
   }
 }
@@ -26,7 +39,8 @@ async function fetchFeaturedEvents(): Promise<ChurchEvent[]> {
     const url = `${process.env.NEXT_PUBLIC_API_URL ?? 'https://api.thogmi.org'}/api/v1/events/?scope=global&featured=true`;
     return await fetchJSON<ChurchEvent[]>(url, CACHE_MEDIUM as any);
   } catch (err) {
-    console.warn('Failed to fetch featured events', err);
+    // eslint-disable-next-line no-console
+    console.warn('Homepage: failed to fetch featured events', err);
     return [];
   }
 }
@@ -36,7 +50,8 @@ async function fetchRecentSermons(): Promise<Sermon[]> {
     const url = `${process.env.NEXT_PUBLIC_API_URL ?? 'https://api.thogmi.org'}/api/v1/sermons/?limit=6&ordering=-date`;
     return await fetchJSON<Sermon[]>(url, CACHE_LONG as any);
   } catch (err) {
-    console.warn('Failed to fetch recent sermons', err);
+    // eslint-disable-next-line no-console
+    console.warn('Homepage: failed to fetch recent sermons', err);
     return [];
   }
 }
@@ -46,17 +61,19 @@ async function fetchSpotlightBranch(): Promise<Branch | null> {
     const url = `${process.env.NEXT_PUBLIC_API_URL ?? 'https://api.thogmi.org'}/api/v1/branches/spotlight/`;
     return await fetchJSON<Branch>(url, CACHE_LONG as any);
   } catch (err) {
-    console.warn('Failed to fetch branch spotlight', err);
+    // eslint-disable-next-line no-console
+    console.warn('Homepage: failed to fetch branch spotlight', err);
     return null;
   }
 }
 
-export default async function HomePage() {
+export default async function HomePage(): Promise<JSX.Element> {
+  // Parallel data fetch for best performance
   const [hero, events, sermons, branch] = await Promise.all([
     fetchHero(),
     fetchFeaturedEvents(),
     fetchRecentSermons(),
-    fetchSpotlightBranch()
+    fetchSpotlightBranch(),
   ]);
 
   return (
@@ -66,6 +83,7 @@ export default async function HomePage() {
       </ErrorBoundary>
 
       <ErrorBoundary>
+        {/* LiveNow is a client component (SWR polling) to reflect rapidly-changing live stream state */}
         <LiveNow />
       </ErrorBoundary>
 
