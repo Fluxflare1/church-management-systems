@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from django.utils import timezone
+from django.db.models import Count, Q, F
+from datetime import timedelta
 from apps.authentication.models import User
 from apps.churches.models import Branch
 from .models import GuestProfile, GuestVisit, GuestCommunication, FollowUpTask
@@ -138,6 +140,84 @@ class GuestProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """Get comprehensive guest statistics"""
+        branch_filter = Q()
+        if hasattr(request.user, 'branch'):
+            branch_filter = Q(branch=request.user.branch)
+        
+        # Date ranges
+        today = timezone.now().date()
+        week_ago = today - timedelta(days=7)
+        month_ago = today - timedelta(days=30)
+        
+        stats = {
+            'total_guests': GuestProfile.objects.filter(branch_filter).count(),
+            'new_this_week': GuestProfile.objects.filter(
+                branch_filter, first_visit_date__gte=week_ago
+            ).count(),
+            'new_this_month': GuestProfile.objects.filter(
+                branch_filter, first_visit_date__gte=month_ago
+            ).count(),
+            'need_follow_up': GuestProfile.objects.filter(
+                branch_filter, 
+                status__in=['new', 'contacted'],
+                last_visit_date__lte=week_ago
+            ).count(),
+            'by_status': dict(GuestProfile.objects.filter(branch_filter)
+                .values_list('status')
+                .annotate(count=Count('id'))
+                .values_list('status', 'count')
+            ),
+            'by_source': dict(GuestProfile.objects.filter(branch_filter)
+                .exclude(source='')
+                .values_list('source')
+                .annotate(count=Count('id'))
+                .values_list('source', 'count')
+            ),
+            'conversion_rate': self._calculate_conversion_rate(branch_filter),
+        }
+        
+        return Response(stats)
+    
+    def _calculate_conversion_rate(self, branch_filter):
+        total_guests = GuestProfile.objects.filter(branch_filter).count()
+        converted_guests = GuestProfile.objects.filter(
+            branch_filter, status='converted'
+        ).count()
+        
+        if total_guests > 0:
+            return round((converted_guests / total_guests) * 100, 2)
+        return 0
+    
+    @action(detail=False, methods=['get'])
+    def trends(self, request):
+        """Get guest trends over time"""
+        from django.db.models.functions import TruncWeek, TruncMonth
+        
+        period = request.query_params.get('period', 'weekly')
+        weeks = int(request.query_params.get('weeks', 12))
+        
+        end_date = timezone.now()
+        start_date = end_date - timedelta(weeks=weeks)
+        
+        trunc_func = TruncWeek if period == 'weekly' else TruncMonth
+        
+        trends = (
+            GuestProfile.objects
+            .filter(created_at__range=[start_date, end_date])
+            .annotate(period=trunc_func('created_at'))
+            .values('period')
+            .annotate(
+                new_guests=Count('id'),
+                returning_guests=Count('id', filter=Q(total_visits__gt=1))
+            )
+            .order_by('period')
+        )
+        
+        return Response(list(trends))
 
 class GuestVisitViewSet(viewsets.ModelViewSet):
     serializer_class = GuestVisitSerializer
