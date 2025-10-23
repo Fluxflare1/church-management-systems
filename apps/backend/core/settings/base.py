@@ -1,6 +1,7 @@
+# apps/backend/core/settings/base.py
 import os
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
 import dj_database_url
 from datetime import timedelta
 
@@ -13,7 +14,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', cast=Csv())
 
 # Application definition
 INSTALLED_APPS = [
@@ -30,12 +31,13 @@ INSTALLED_APPS = [
     'django_filters',
     'django_extensions',
     'rest_framework_simplejwt',
+    'sendgrid_backend',
     
     # Local apps (commented out until created)
     'authentication',
     # 'churches',
     # 'members',
-    # 'guests',
+    'guests',
     # 'cmas',
     # 'groups',
     # 'events',
@@ -189,11 +191,32 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# Email configuration
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+# Email Configuration
+USE_SENDGRID = config('USE_SENDGRID', default=False, cast=bool)
+SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@thogmi.org')
+DEFAULT_FROM_NAME = 'THOGMi Church'
+
+# Email backend configuration
+if USE_SENDGRID:
+    EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+    # SendGrid specific settings
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
+    SENDGRID_ECHO_TO_STDOUT = DEBUG
+else:
+    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+    EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+    EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+# Twilio Configuration
+TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN', default='')
+TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER', default='')
+
+# WhatsApp Configuration
+WHATSAPP_ACCESS_TOKEN = config('WHATSAPP_ACCESS_TOKEN', default='')
+WHATSAPP_PHONE_NUMBER_ID = config('WHATSAPP_PHONE_NUMBER_ID', default='')
+WHATSAPP_API_VERSION = 'v18.0'
