@@ -24,7 +24,7 @@ docker-compose up -d --build
 
 # Wait for services to be ready
 Write-Host "Waiting for services to be ready..." -ForegroundColor Yellow
-Start-Sleep -Seconds 10
+Start-Sleep -Seconds 15
 
 # Run database migrations
 Write-Host "Running database migrations..." -ForegroundColor Green
@@ -32,14 +32,17 @@ docker-compose exec backend python manage.py migrate
 
 # Create superuser
 Write-Host "Creating superuser..." -ForegroundColor Green
+docker-compose exec backend python manage.py createsuperuser --noinput --username admin --email admin@thogmi.org
+
+# Set superuser password
+Write-Host "Setting superuser password..." -ForegroundColor Green
 docker-compose exec backend python manage.py shell -c "
 from django.contrib.auth import get_user_model
 User = get_user_model()
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@thogmi.org', 'admin123')
-    print('Superuser created: username=admin, password=admin123')
-else:
-    print('Superuser already exists')
+user = User.objects.get(username='admin')
+user.set_password('admin123')
+user.save()
+print('Superuser created: username=admin, password=admin123')
 "
 
 # Collect static files
