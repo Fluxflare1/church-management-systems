@@ -25,11 +25,6 @@ COPY . .
 RUN mkdir -p /app/staticfiles
 RUN mkdir -p /app/media
 
-# Create a non-root user and switch to it
-RUN adduser --disabled-password --gecos '' myuser
-RUN chown -R myuser:myuser /app
-USER myuser
-
 # Expose port
 EXPOSE 8000
 
