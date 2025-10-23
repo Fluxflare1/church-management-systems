@@ -16,18 +16,19 @@ services:
     restart: unless-stopped
 
   backend:
-    build:
-      context: ./apps/backend
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./apps/backend:/app
-      - ./media:/app/media
-      - ./staticfiles:/app/staticfiles
-    environment:
-      - DATABASE_URL=postgresql://thogmi_dev:password@db:5432/thogmi_platform
-      - REDIS_URL=redis://redis:6379/0
+  build:
+    context: ./apps/backend
+    dockerfile: Dockerfile
+  ports:
+    - "8000:8000"
+  volumes:
+    - ./apps/backend:/app
+    - ./media:/app/media
+    - ./staticfiles:/app/staticfiles
+  # Add this for Windows
+  environment:
+    - PYTHONUNBUFFERED=1
+    - DJANGO_SETTINGS_MODULE=core.settings.development
     depends_on:
       - db
       - redis
