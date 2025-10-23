@@ -1,0 +1,68 @@
+[
+  {
+    "model": "guests.automatedworkflow",
+    "pk": 1,
+    "fields": {
+      "name": "New Guest Welcome Sequence",
+      "trigger_type": "new_guest",
+      "branch": null,
+      "is_active": true,
+      "delay_hours": 0
+    }
+  },
+  {
+    "model": "guests.workflowstep",
+    "pk": 1,
+    "fields": {
+      "workflow": 1,
+      "step_order": 1,
+      "action_type": "send_email",
+      "template": "Hi {{ guest_name }},\n\nWe're so glad you visited {{ branch_name }}! Thank you for taking the time to connect with us.\n\nWe'd love to help you get connected and learn more about our church family. Here are some next steps:\n\n1. Join us again this Sunday\n2. Check out our small groups\n3. Let us know how we can pray for you\n\nBlessings,\nThe {{ branch_name }} Team",
+      "assigned_to": null
+    }
+  },
+  {
+    "model": "guests.workflowstep",
+    "pk": 2,
+    "fields": {
+      "workflow": 1,
+      "step_order": 2,
+      "action_type": "send_whatsapp",
+      "template": "Hi {{ guest_name }}! 👋 This is {{ branch_name }} church. We're so glad you visited us! Is there anything we can pray for you about? Reply to this message and our prayer team will lift you up.",
+      "assigned_to": null
+    }
+  },
+  {
+    "model": "guests.automatedworkflow",
+    "pk": 2,
+    "fields": {
+      "name": "Second Visit Follow-up",
+      "trigger_type": "second_visit",
+      "branch": null,
+      "is_active": true,
+      "delay_hours": 0
+    }
+  },
+  {
+    "model": "guests.workflowstep",
+    "pk": 3,
+    "fields": {
+      "workflow": 2,
+      "step_order": 1,
+      "action_type": "send_in_app",
+      "template": "We noticed {{ guest_name }} visited for the second time! Consider reaching out to personally welcome them.",
+      "assigned_to": null
+    }
+  },
+  {
+    "model": "guests.workflowstep",
+    "pk": 4,
+    "fields": {
+      "workflow": 2,
+      "step_order": 2,
+      "action_type": "create_task",
+      "template": "Personal follow-up with {{ guest_name }}\n\nGuest has visited twice and shown interest in our church. Please reach out for a personal connection.\n\nContact info:\nEmail: {{ guest.user.email }}\nPhone: {{ guest.user.phone_number }}\n\nSuggested talking points:\n- Thank them for visiting again\n- Ask about their experience\n- Invite to small group or next event",
+      "assigned_to": null
+    }
+  }
+]
