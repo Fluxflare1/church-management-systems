@@ -220,3 +220,14 @@ TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER', default='')
 WHATSAPP_ACCESS_TOKEN = config('WHATSAPP_ACCESS_TOKEN', default='')
 WHATSAPP_PHONE_NUMBER_ID = config('WHATSAPP_PHONE_NUMBER_ID', default='')
 WHATSAPP_API_VERSION = 'v18.0'
+
+# Communication settings
+COMMUNICATION_SETTINGS = {
+    'DEFAULT_FROM_EMAIL': 'noreply@thogmi.org',
+    'SENDGRID_API_KEY': config('SENDGRID_API_KEY', default=''),
+    'TWILIO_ACCOUNT_SID': config('TWILIO_ACCOUNT_SID', default=''),
+    'TWILIO_AUTH_TOKEN': config('TWILIO_AUTH_TOKEN', default=''),
+    'TWILIO_WHATSAPP_NUMBER': config('TWILIO_WHATSAPP_NUMBER', default=''),
+    'MAX_RETRIES': 3,
+    'RETRY_DELAY': 60,  # seconds
+}
