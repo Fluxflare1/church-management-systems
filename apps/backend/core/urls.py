@@ -7,9 +7,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('authentication.urls')),
     # path('api/v1/churches/', include('churches.urls')),
-    # path('api/v1/members/', include('members.urls')),
-    # path('api/v1/guests/', include('guests.urls')),
-    # path('api/v1/cmas/', include('cmas.urls')),
+    path('api/v1/members/', include('members.urls')),
+    path('api/v1/guests/', include('guests.urls')),
+    path('api/v1/cmas/', include('cmas.urls')),
+    path('communications/', include('communications.urls')),
     # path('api/v1/events/', include('events.urls')),
     # path('api/v1/groups/', include('groups.urls')),
 ]
@@ -18,3 +19,6 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+
