@@ -1,4 +1,5 @@
 import { Providers } from './providers';
+import { CommunicationProvider } from '@/providers/communication-provider';
 
 export default function RootLayout({
   children,
@@ -8,12 +9,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>
-          {children}
-        </Providers>
+        <CommunicationProvider>
+          <Providers>
+            {children}
+          </Providers>
+        </CommunicationProvider>
       </body>
     </html>
   );
 }
-
-
