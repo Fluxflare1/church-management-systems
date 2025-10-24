@@ -1,4 +1,3 @@
-
 'use client';
 
 import { NotificationCenter } from '@/lib/communications';
@@ -20,25 +19,10 @@ export default function Header() {
           </div>
           
           {/* Other header items */}
-        </div>
-      </div>
-    </header>
-  );
-}
-
-
-
-
-
-export function Header() {
-  return (
-    <header className="border-b bg-background">
-      <div className="flex h-16 items-center px-4">
-        {/* ... other header content ... */}
-        
-        <div className="ml-auto flex items-center space-x-4">
-          <NotificationCenter />
-          {/* ... other header items ... */}
+          <div className="ml-auto flex items-center space-x-4">
+            <NotificationCenter />
+            {/* ... other header items ... */}
+          </div>
         </div>
       </div>
     </header>
