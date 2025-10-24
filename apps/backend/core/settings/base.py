@@ -36,9 +36,9 @@ INSTALLED_APPS = [
     # Local apps (commented out until created)
     'authentication',
     # 'churches',
-    # 'members',
+    'members',
     'guests',
-    # 'cmas',
+    'cmas',
     # 'groups',
     # 'events',
     # 'appointments',
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     # 'storage',
     # 'communications',
     # 'reporting',
-    # 'integrations',
+    'integrations',
 ]
 
 MIDDLEWARE = [
