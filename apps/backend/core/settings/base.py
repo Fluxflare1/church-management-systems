@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     # 'donations',
     # 'assets',
     # 'storage',
-    # 'communications',
+    'communications',
     # 'reporting',
     'integrations',
 ]
