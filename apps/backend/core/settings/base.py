@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework_simplejwt',
     'sendgrid_backend',
+    'channels',
+    'channels_redis',
     
     # Local apps (commented out until created)
     'authentication',
@@ -81,6 +83,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
 DATABASES = {
@@ -191,6 +194,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
+# Django Channels configuration
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
 # Email Configuration
 USE_SENDGRID = config('USE_SENDGRID', default=False, cast=bool)
 SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='')
@@ -220,6 +233,16 @@ TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER', default='')
 WHATSAPP_ACCESS_TOKEN = config('WHATSAPP_ACCESS_TOKEN', default='')
 WHATSAPP_PHONE_NUMBER_ID = config('WHATSAPP_PHONE_NUMBER_ID', default='')
 WHATSAPP_API_VERSION = 'v18.0'
+
+# WhatsApp templates configuration
+WHATSAPP_TEMPLATES = {
+    'church_announcement': config('WHATSAPP_TEMPLATE_ANNOUNCEMENT', default=''),
+    'welfare_followup': config('WHATSAPP_TEMPLATE_WELFARE', default=''),
+    'event_reminder': config('WHATSAPP_TEMPLATE_EVENT', default=''),
+}
+
+# Firebase configuration
+FIREBASE_CREDENTIALS_PATH = config('FIREBASE_CREDENTIALS_PATH', default='')
 
 # Communication settings
 COMMUNICATION_SETTINGS = {
